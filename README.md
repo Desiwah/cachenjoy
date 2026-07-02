@@ -23,30 +23,31 @@ link like a password. You need your own Usenet provider and indexers.
 
 ## Setup
 
-You'll need Docker, a domain pointed at your server, and a reverse proxy
-(Caddy, nginx, whatever you already run) in front of it for HTTPS.
+All you need is Docker.
 
 ```
-git clone https://github.com/Desiwah/cachenjoy
+git clone https://github.com/YOURNAME/cachenjoy
 cd cachenjoy
-cp .env.example .env      # fill in your domain and a files token
+cp .env.example .env      # fill in a files token, see the comments in that file
 docker compose up -d --build
 ```
 
-The addon listens on `127.0.0.1:4040`, so point your reverse proxy there
-(e.g. `reverse_proxy 127.0.0.1:4040` in Caddy, `proxy_pass
-http://127.0.0.1:4040` in nginx). If your reverse proxy is itself a
-container, it's easier to join it to this stack's `web_network` and target
-the `cachenjoy` container by name instead - copy
-`compose.override.yaml.example` to `compose.override.yaml` for that.
+Open `http://your-server-ip:4040/configure`, set an admin password, and
+follow the two steps on the page - Hydra URL/key and SABnzbd URL/key are
+mostly auto-detected since they run in the same stack. Pick your downloads
+folder, save, and the page gives you the install link for Stremio. Nothing
+is usable until that first admin password is set.
 
-Then open `https://your-domain/configure`, set an admin password, and follow
-the two steps on the page - Hydra URL/key and SABnzbd URL/key are mostly
-auto-detected since they run in the same stack. Pick your downloads folder,
-save, and the page gives you the install link for Stremio.
-
-The Hydra and SABnzbd web UIs are reachable from the top bar of the configure
+The Hydra and SABnzbd web UIs are reachable from the top bar of the same
 page, behind the same admin login. No extra ports or subdomains needed.
+
+If you want a real domain and HTTPS instead of a bare IP (recommended for
+anything beyond quick testing), put a reverse proxy in front - Caddy, nginx,
+whatever you already run - pointed at port 4040, and set `ADDON_BASE_URL`
+in `.env` to your domain instead of the IP. If your reverse proxy is itself
+a container, it's easier to join it to this stack's `web_network` and
+target the `cachenjoy` container by name instead of the published port -
+copy `compose.override.yaml.example` to `compose.override.yaml` for that.
 
 ## Auto-cleanup
 

@@ -542,7 +542,7 @@
                     <button class="help-btn" onclick="showHelp('diskPath')">?</button>
                 </div>
                 <div class="input-with-btn">
-                    <input id="diskPath" placeholder="/opt/cachenjoy/sabnzbd/downloads/complete">
+                    <input id="diskPath" placeholder="/home/youruser/cachenjoy/sabnzbd/downloads/complete">
                     <button class="retry-btn" onclick="openBrowser('diskPath')">Browse</button>
                 </div>
             </div>
@@ -553,7 +553,7 @@
                     <button class="help-btn" onclick="showHelp('incompletePath')">?</button>
                 </div>
                 <div class="input-with-btn">
-                    <input id="incompletePath" placeholder="/opt/cachenjoy/sabnzbd/downloads/incomplete">
+                    <input id="incompletePath" placeholder="/home/youruser/cachenjoy/sabnzbd/downloads/incomplete">
                     <button class="retry-btn" onclick="openBrowser('incompletePath')">Browse</button>
                 </div>
             </div>
@@ -665,7 +665,7 @@ const HELP = {
     diskPath: {
         title: "Folder where downloads are saved",
         body: "The real path on your server's disk where SABnzbd puts finished downloads.\n\n• This is how CacheNjoy actually finds and serves your files, so it has to be correct for streaming to work at all.\n• Also used by the cleanup command below, so old files get deleted from the right place.\n• Same as the \"Completed Download Folder\" path from SABnzbd's Config, then Folders.\n• Saved here, so changing it takes effect right away. No restart needed.",
-        example: "/opt/cachenjoy/sabnzbd/downloads/complete"
+        example: "/home/youruser/cachenjoy/sabnzbd/downloads/complete"
     },
     retentionHours: {
         title: "Delete files older than (hours)",
@@ -674,7 +674,7 @@ const HELP = {
     incompletePath: {
         title: "SABnzbd's incomplete/temp downloads folder",
         body: "Failed or aborted downloads (a bad NZB, missing repair blocks, etc.) can leave leftover partial files behind in SABnzbd's temporary folder - separate from the finished-downloads folder above, and not something the cleanup command touches unless you set this.\n\n• Same as the \"Temporary Download Folder\" path from SABnzbd's Config, then Folders.\n• Anything sitting here untouched for a while is treated as abandoned and removed - a genuinely active download keeps writing new data, so it's never mistaken for one.\n• Leave blank to skip this entirely.",
-        example: "/opt/cachenjoy/sabnzbd/downloads/incomplete"
+        example: "/home/youruser/cachenjoy/sabnzbd/downloads/incomplete"
     }
 };
 

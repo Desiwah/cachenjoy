@@ -378,22 +378,18 @@ async function probeCandidates(candidates) {
 // read off disk. Hydra obfuscates its key even in its own config file, so
 // this trick only works for SABnzbd - Hydra's URL still auto-detects fine.
 // PROJECT_DIR is set by compose to wherever you ran `docker compose up`
-// from, so this works no matter what folder you cloned into. the other
-// two are just a fallback in case PROJECT_DIR isn't set for some reason.
+// from, so this works no matter what folder you cloned into. if it's
+// somehow missing, this just returns null and you paste the key by hand -
+// no point guessing at a directory that only matches one specific setup.
 function detectSabApiKey() {
-  const candidatePaths = [
-    process.env.PROJECT_DIR && `${HOST_ROOT}${process.env.PROJECT_DIR}/sabnzbd/config/sabnzbd.ini`,
-    `${HOST_ROOT}/opt/cachenjoy/sabnzbd/config/sabnzbd.ini`,
-    `${HOST_ROOT}/opt/sabnzbd/config/sabnzbd.ini`,
-  ].filter(Boolean);
-  for (const filePath of candidatePaths) {
-    try {
-      const content = fs.readFileSync(filePath, "utf8");
-      const match = content.match(/^api_key\s*=\s*(\S+)/m);
-      if (match) return match[1];
-    } catch (e) {
-      // try the next one
-    }
+  if (!process.env.PROJECT_DIR) return null;
+  const filePath = `${HOST_ROOT}${process.env.PROJECT_DIR}/sabnzbd/config/sabnzbd.ini`;
+  try {
+    const content = fs.readFileSync(filePath, "utf8");
+    const match = content.match(/^api_key\s*=\s*(\S+)/m);
+    if (match) return match[1];
+  } catch (e) {
+    // not there
   }
   return null;
 }

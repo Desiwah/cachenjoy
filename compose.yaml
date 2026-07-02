@@ -14,13 +14,14 @@ services:
       # of where this got cloned to - PWD is whatever directory you ran
       # `docker compose up` from
       - PROJECT_DIR=${PWD}
-    # bound to localhost so it's reachable by a reverse proxy running on
-    # the host, without exposing plain HTTP straight to the internet.
-    # if your reverse proxy is itself a container on web_network, it can
-    # just reach this by container name instead and this mapping is
-    # redundant but harmless.
+    # reachable directly at http://your-server-ip:4040 so setup works with
+    # nothing else running yet - same default every comparable self-hosted
+    # app (Sonarr, Radarr, Jellyfin, SABnzbd itself) ships with. nothing
+    # is usable until an admin password is set, same protection those
+    # apps rely on too. put a reverse proxy with HTTPS in front for real
+    # use, same as you would for any of them.
     ports:
-      - "127.0.0.1:4040:4040"
+      - "4040:4040"
     volumes:
       # full read-only host mount, used by the folder browser and for
       # serving downloads - the actual folder is a setting, not a separate
