@@ -1,0 +1,10 @@
+# secrets and deployment-specific config
+.env
+compose.override.yaml
+
+# runtime data of the bundled apps - contains real API keys and settings
+hydra/
+sabnzbd/
+
+node_modules/
+*.log

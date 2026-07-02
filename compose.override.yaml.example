@@ -1,0 +1,9 @@
+# optional - copy to compose.override.yaml if your reverse proxy is
+# itself a docker container and you'd rather reach cachenjoy by container
+# name on a shared network than through the published 127.0.0.1:4040 port.
+# docker compose merges this automatically if a file named exactly
+# "compose.override.yaml" exists alongside compose.yaml.
+
+networks:
+  web_network:
+    external: true   # join your reverse proxy's existing network instead of creating a new one

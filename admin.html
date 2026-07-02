@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CacheNjoy</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'%3E%3Ctext x='5' y='75' font-family='sans-serif' font-weight='800' font-size='70' fill='%23FF8C42' stroke='%23222' stroke-width='2'%3EC%3C/text%3E%3Ctext x='52' y='75' font-family='sans-serif' font-weight='300' font-style='italic' font-size='70' fill='%23eee' stroke='%23222' stroke-width='2'%3EN%3C/text%3E%3C/svg%3E">
+<style>
+    body {
+        background-color: #111;
+        color: #eee;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        margin: 0;
+        padding: 76px 16px 220px;
+        box-sizing: border-box;
+    }
+
+    a { text-decoration: none; color: #FF8C42; }
+
+    .wrap { width: 100%; max-width: 560px; margin: 0 auto; }
+
+    .intro-card { max-width: 560px; margin: 0 auto; }
+
+    .setup-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin-top: 24px;
+    }
+
+    .step-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #FF8C42;
+        color: #1a1a1a;
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+
+    .step-card h2 { display: flex; align-items: center; }
+
+    .action-panel {
+        max-width: 560px;
+        margin: 28px auto 0;
+        background: #1c2417;
+        border: 1px solid #3a4a30;
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        text-align: center;
+    }
+    .action-panel .btn-primary { max-width: 360px; margin: 0 auto; }
+
+    @media (min-width: 880px) {
+        .wrap { max-width: 880px; }
+        .intro-card, .action-panel { max-width: 700px; }
+        .setup-grid { grid-template-columns: 1fr 1fr; }
+        .setup-grid .full-width { grid-column: 1 / -1; }
+    }
+
+    .page-layout { display: flex; flex-direction: column; gap: 24px; }
+    .sidebar, .sidebar-right { width: 100%; }
+
+    /* fixed position so they float outside .wrap instead of squeezing it.
+       440px is half of .wrap's max-width, sidebars anchor off that same
+       center point so neither one can push the main column around */
+    @media (min-width: 1700px) {
+        .sidebar, .sidebar-right {
+            position: fixed;
+            top: 76px;
+            width: 380px;
+            /* scrolls internally once content gets taller than the viewport */
+            max-height: calc(100vh - 96px);
+            overflow-y: auto;
+        }
+        .sidebar { left: calc(50% - 440px - 28px - 380px); }
+        .sidebar-right { left: calc(50% + 440px + 28px); }
+    }
+
+    .top-message {
+        text-align: center;
+        color: #aaa;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        background: #222;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .logo { width: 64px; height: 64px; margin: 0 auto 0.5rem; display: block; }
+
+    h1 { color: #eee; margin: 0.5rem 0 0.5rem; font-weight: 300; font-style: italic; text-align: center; font-size: 1.8rem; }
+    h1 b { color: #FF8C42; font-weight: 700; font-style: normal; }
+
+    h2 { font-size: 13px; color: #999; margin: 28px 0 10px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #333; padding-bottom: 8px; }
+
+    p.subtitle { color: #aaa; font-size: 0.9rem; text-align: center; margin: 0 0 2rem; }
+
+    .field { margin-bottom: 18px; }
+
+    .field-label-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+
+    label { font-size: 13px; color: #bbb; }
+
+    .help-btn {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #333;
+        color: #aaa;
+        border: 1px solid #444;
+        font-size: 11px;
+        line-height: 1;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-weight: 700;
+        padding: 0;
+    }
+    .help-btn:hover { background: #FF8C42; color: #1a1a1a; border-color: #FF8C42; }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        background: #333;
+        border: 1px solid #444;
+        color: #fff;
+        border-radius: 6px;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.2s;
+        font-size: 0.95rem;
+    }
+    input:focus { border-color: #FF8C42; }
+
+    button {
+        border-radius: 6px;
+        cursor: pointer;
+        border: none;
+        font-size: 0.95rem;
+        font-weight: 600;
+        font-family: inherit;
+        transition: all 0.2s;
+        padding: 12px 0;
+    }
+
+    .btn-primary { background: #FF8C42; color: #1a1a1a; width: 100%; margin-top: 10px; }
+    .btn-primary:hover { background: #ffa260; }
+    .btn-primary:disabled { background: #555; color: #999; cursor: not-allowed; }
+
+    #result {
+        margin-top: 24px;
+        padding: 16px;
+        background: #1a1a1a;
+        border-radius: 10px;
+        display: none;
+        font-size: 0.85rem;
+    }
+    #result a { display: inline-block; margin-top: 10px; color: #FF8C42; font-weight: 600; }
+
+    .code-box {
+        position: relative;
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    .code-box, .code-box pre, .result-note, #result {
+        text-align: left;
+    }
+    .code-box pre {
+        margin: 0;
+        padding-right: 70px;
+        white-space: pre-wrap;
+        word-break: break-all;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        color: #FF8C42;
+    }
+    .copy-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #333;
+        color: #eee;
+        border: 1px solid #444;
+        padding: 6px 12px;
+        font-size: 0.78rem;
+        border-radius: 6px;
+    }
+    .copy-btn:hover { background: #FF8C42; color: #1a1a1a; border-color: #FF8C42; }
+
+    .result-note { font-size: 0.8rem; color: #888; }
+
+    .detect-status { font-size: 0.78rem; margin-left: auto; }
+    .detect-status.found { color: #4caf50; }
+    .detect-status.notfound { color: #e0a030; }
+    .detect-status.checking { color: #888; }
+
+    .input-with-btn { display: flex; gap: 8px; }
+    .input-with-btn input { flex: 1; min-width: 0; }
+    .retry-btn {
+        background: #333;
+        color: #eee;
+        border: 1px solid #444;
+        padding: 0 14px;
+        font-size: 0.82rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .retry-btn:hover { background: #FF8C42; color: #1a1a1a; border-color: #FF8C42; }
+
+    .browser-box { max-width: 480px; max-height: 80vh; display: flex; flex-direction: column; }
+    .browser-path {
+        background: #1a1a1a;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: 0.82rem;
+        color: #FF8C42;
+        margin-bottom: 12px;
+        word-break: break-all;
+        font-family: monospace;
+    }
+    .browser-list {
+        overflow-y: auto;
+        flex: 1;
+        border: 1px solid #333;
+        border-radius: 8px;
+        margin-bottom: 14px;
+        min-height: 200px;
+        max-height: 360px;
+    }
+    .browser-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #2a2a2a;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .browser-item:last-child { border-bottom: none; }
+    .browser-item:hover { background: #2a2a2a; }
+    .browser-item.parent { color: #999; }
+    .browser-actions { display: flex; gap: 10px; }
+    .browser-actions button { flex: 1; }
+
+    .footer-note { margin-top: 1.5rem; font-size: 0.8rem; color: #555; text-align: center; }
+
+    .support-links { display: flex; justify-content: center; gap: 0.9rem; align-items: center; flex-wrap: wrap; }
+    .badge-link, .badge-discord-link {
+        display: flex;
+        align-items: center;
+    }
+    .icon-heart { display: block; transform-box: fill-box; transform-origin: center; }
+    .badge-link:hover .icon-heart { animation: heartbeat 0.9s ease-in-out infinite; }
+    @keyframes heartbeat {
+        0%, 100% { transform: scale(1); }
+        25% { transform: scale(1.25); }
+        40% { transform: scale(1); }
+        55% { transform: scale(1.15); }
+    }
+    .badge-discord-link svg { fill: #888; transition: fill 0.2s; }
+    .badge-discord-link:hover svg { fill: #5865f2; }
+
+    /* Help popup modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+        background: #222;
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 420px;
+        width: 100%;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    }
+    .modal-box h3 { margin: 0 0 12px; color: #FF8C42; font-size: 1.1rem; }
+    .modal-box p { margin: 0 0 14px; color: #ccc; font-size: 0.9rem; line-height: 1.5; white-space: pre-line; }
+    .modal-box .example { background: #1a1a1a; padding: 8px 10px; border-radius: 6px; font-size: 0.82rem; color: #FF8C42; word-break: break-all; margin-bottom: 14px; }
+    .modal-box button { width: 100%; background: #333; color: #eee; }
+    .modal-box button:hover { background: #444; }
+
+    .login-card { max-width: 380px; margin: 80px auto 0; }
+    .login-error { color: #e05050; font-size: 0.85rem; margin-top: 10px; text-align: center; display: none; }
+
+    .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    .toggle-row .toggle-label { font-size: 0.9rem; color: #ddd; }
+    .toggle-row .toggle-desc { font-size: 0.78rem; color: #888; margin-top: 2px; }
+    .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch-slider {
+        position: absolute; cursor: pointer; inset: 0;
+        background: #444; border-radius: 24px; transition: 0.2s;
+    }
+    .switch-slider:before {
+        position: absolute; content: ""; height: 18px; width: 18px;
+        left: 3px; bottom: 3px; background: #eee; border-radius: 50%; transition: 0.2s;
+    }
+    .switch input:checked + .switch-slider { background: #FF8C42; }
+    .switch input:checked + .switch-slider:before { transform: translateX(20px); }
+
+    .top-bar {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 9999;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 56px;
+        padding: 10px 20px;
+        box-sizing: border-box;
+        background: #1a1a1a;
+        border-bottom: 1px solid #333;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+    .top-bar a.logout-link { font-size: 14px; color: #888; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .top-bar a.logout-link:hover { color: #FF8C42; }
+
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .tabs .brand { font-weight: 700; font-size: 16px; margin-right: 6px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .tab-btn {
+        background: #222;
+        color: #aaa;
+        border: 1px solid #333;
+        padding: 10px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 6px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: normal;
+        box-sizing: border-box;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .tab-btn:hover { color: #eee; border-color: #555; }
+    .tab-btn.active { background: #FF8C42; color: #1a1a1a; border-color: #FF8C42; }
+
+    .tab-page { display: none; }
+    .tab-page.active { display: block; }
+
+</style>
+</head>
+<body>
+
+<div id="loginScreen" style="display:none">
+    <div class="card login-card">
+        <h1><b>Cache</b>Njoy</h1>
+        <p class="subtitle">Admin panel. Enter your password to continue.</p>
+        <div class="field">
+            <input id="loginPassword" type="password" placeholder="Password" onkeydown="if(event.key==='Enter') login()">
+        </div>
+        <button class="btn-primary" onclick="login()">Log in</button>
+        <div id="loginError" class="login-error"></div>
+        <div style="text-align:center; margin-top:16px;">
+            <a href="#" onclick="toggleForgotPassword(); return false;" style="font-size:0.82rem;">Forgot your password?</a>
+        </div>
+        <div id="forgotPasswordNote" style="display:none; margin-top:14px;">
+            <p class="subtitle" style="text-align:left; margin-bottom:10px;">
+                There's no email to send a reset link to, this runs on your own server. Run this on your server to clear it, then reload this page to set a new one:
+            </p>
+            <div class="code-box">
+                <button class="copy-btn" onclick="copyCode(this, 'resetPasswordCode')">Copy</button>
+                <pre id="resetPasswordCode">docker exec cachenjoy node -e "require('./settings').resetAdminPassword()"</pre>
+            </div>
+            <div class="result-note">This only clears the password. Your Hydra, SABnzbd, and install link settings are untouched.</div>
+        </div>
+    </div>
+</div>
+
+<div id="setupScreen" style="display:none">
+    <div class="card login-card">
+        <h1><b>Cache</b>Njoy</h1>
+        <p class="subtitle">Welcome. Set an admin password to get started, at least 8 characters.</p>
+        <div class="field">
+            <input id="setupPassword" type="password" placeholder="New password">
+        </div>
+        <div class="field">
+            <input id="setupPasswordConfirm" type="password" placeholder="Confirm new password" onkeydown="if(event.key==='Enter') setupPassword()">
+        </div>
+        <button class="btn-primary" onclick="setupPassword()">Set Password</button>
+        <div id="setupError" class="login-error"></div>
+    </div>
+</div>
+
+<div id="adminPanel" style="display:none">
+<div class="top-bar">
+    <div class="tabs">
+        <span class="brand"><span style="color:#FF8C42;">Cache</span><span style="color:#fff;">Njoy</span></span>
+        <button class="tab-btn active" onclick="showTab('configuration')">Configuration</button>
+        <a class="tab-btn" href="/hydra">Hydra</a>
+        <a class="tab-btn" href="/sabnzbd">SABnzbd</a>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+        <div class="support-links">
+            <a href="https://donation.8520456.xyz" target="_blank" class="badge-link" title="Support the project" aria-label="Support the project">
+                <svg class="icon-heart" viewBox="0 0 24 24" width="26" height="26" fill="#ff4d4d"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </a>
+            <a href="https://v1.0.8520456.xyz" target="_blank" class="badge-discord-link" title="Discord" aria-label="Discord">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="#5865f2"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+            </a>
+        </div>
+        <a href="#" class="logout-link" onclick="logout(); return false;">Log out</a>
+    </div>
+</div>
+
+<div class="wrap">
+
+<div id="tab-configuration" class="tab-page active">
+    <div class="page-layout">
+    <div class="sidebar">
+    <div class="card" style="margin-bottom: 0;">
+        <h2 style="margin-top:0; border-top:none">Auto-Cleanup (optional)</h2>
+        <p class="subtitle" style="text-align:left; margin-bottom:1.5rem">
+            Downloaded files pile up over time. This runs entirely on its own, no command to paste anywhere.
+            <br>• A separate, isolated piece of CacheNjoy checks every 5 minutes.
+            <br>• Skips anything currently being watched.
+            <br>• Also skips anything played recently, even if it's not open right now - the clock resets on every play, not just on download.
+            <br>• If you set SABnzbd's incomplete folder in the SABnzbd step, leftovers from failed or aborted downloads get cleared too.
+        </p>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Enable automatic cleanup</div>
+                <div class="toggle-desc">Deletes old, unwatched downloads on its own.</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="cleanupEnabled">
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+
+        <div class="field">
+            <div class="field-label-row">
+                <label>Delete files older than (hours)</label>
+                <button class="help-btn" onclick="showHelp('retentionHours')">?</button>
+            </div>
+            <input id="retentionHours" type="number" value="5" min="1">
+        </div>
+
+        <div class="field" style="margin-bottom:0;">
+            <button class="retry-btn" style="width:100%; padding:12px 0;" onclick="doClearCacheNow(this)">Clear cache now</button>
+            <div class="result-note" style="margin-top:8px;">Removes everything not currently being watched, right now, regardless of the hours above or whether auto-cleanup is even on. Also clears out abandoned leftovers from the incomplete folder, if set. Doesn't change either setting.</div>
+            <div id="clearCacheResult" class="result-note" style="margin-top:8px;"></div>
+        </div>
+    </div>
+    </div>
+
+    <div class="main-column">
+    <div class="card intro-card">
+        <h1><b>Cache</b>Njoy</h1>
+        <p class="subtitle">
+            <b style="color: #FF8C42;">Cache</b><b style="color: #fff;">Njoy</b> searches Usenet, downloads it fully, then plays it.<br>
+            Settings here are saved on this server and apply to your one install, any time you change them.
+        </p>
+        <p class="subtitle">Two steps below, in order. Tap the <b style="color:#FF8C42">?</b> next to anything you're unsure about.</p>
+    </div>
+
+    <div class="setup-grid">
+        <div class="card step-card">
+            <h2 style="margin-top:0; border-top:none"><span class="step-badge">1</span> NZBHydra2 (your indexer search)</h2>
+
+            <div class="field">
+                <div class="field-label-row">
+                    <label>Hydra URL</label>
+                    <button class="help-btn" onclick="showHelp('hydraUrl')">?</button>
+                    <span id="hydraUrlStatus" class="detect-status"></span>
+                </div>
+                <div class="input-with-btn">
+                    <input id="hydraUrl" placeholder="http://hydra:5076">
+                    <button class="retry-btn" onclick="autoDetect('hydra')">Auto-detect</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-label-row">
+                    <label>Hydra API Key</label>
+                    <button class="help-btn" onclick="showHelp('hydraKey')">?</button>
+                </div>
+                <input id="hydraKey" placeholder="Paste your API key">
+            </div>
+        </div>
+
+        <div class="card step-card">
+            <h2 style="margin-top:0; border-top:none"><span class="step-badge">2</span> SABnzbd (downloads the file)</h2>
+
+            <div class="field">
+                <div class="field-label-row">
+                    <label>SABnzbd URL</label>
+                    <button class="help-btn" onclick="showHelp('sabUrl')">?</button>
+                    <span id="sabUrlStatus" class="detect-status"></span>
+                </div>
+                <div class="input-with-btn">
+                    <input id="sabUrl" placeholder="http://sabnzbd:8080">
+                    <button class="retry-btn" onclick="autoDetect('sab')">Auto-detect</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-label-row">
+                    <label>SABnzbd API Key</label>
+                    <button class="help-btn" onclick="showHelp('sabKey')">?</button>
+                </div>
+                <input id="sabKey" placeholder="Paste your API key">
+            </div>
+
+            <div class="field">
+                <div class="field-label-row">
+                    <label>Folder where downloads are saved</label>
+                    <button class="help-btn" onclick="showHelp('diskPath')">?</button>
+                </div>
+                <div class="input-with-btn">
+                    <input id="diskPath" placeholder="/opt/cachenjoy/sabnzbd/downloads/complete">
+                    <button class="retry-btn" onclick="openBrowser('diskPath')">Browse</button>
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="field-label-row">
+                    <label>SABnzbd's incomplete/temp downloads folder (optional)</label>
+                    <button class="help-btn" onclick="showHelp('incompletePath')">?</button>
+                </div>
+                <div class="input-with-btn">
+                    <input id="incompletePath" placeholder="/opt/cachenjoy/sabnzbd/downloads/incomplete">
+                    <button class="retry-btn" onclick="openBrowser('incompletePath')">Browse</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="action-panel">
+        <p class="subtitle" style="margin-bottom:1rem">Save your settings. Your install link stays the same forever, even after future changes here.</p>
+        <button class="btn-primary" onclick="saveSettings(this)">Save</button>
+        <div id="result"></div>
+    </div>
+    </div>
+
+    <div class="sidebar-right">
+    <div class="card" style="margin-bottom: 0;">
+        <h2 style="margin-top:0; border-top:none">Account</h2>
+        <div class="field">
+            <div class="field-label-row">
+                <label>Current password</label>
+            </div>
+            <input id="currentPassword" type="password" placeholder="Current password">
+        </div>
+        <div class="field">
+            <div class="field-label-row">
+                <label>New password</label>
+            </div>
+            <input id="newPassword" type="password" placeholder="At least 8 characters">
+        </div>
+        <div class="field">
+            <div class="field-label-row">
+                <label>Confirm new password</label>
+            </div>
+            <input id="newPasswordConfirm" type="password" placeholder="Confirm new password" onkeydown="if(event.key==='Enter') changePassword(this)">
+        </div>
+        <button class="btn-primary" onclick="changePassword(this)">Change Password</button>
+        <div id="changePasswordResult" style="display:none; margin-top:10px;"></div>
+    </div>
+
+    <div class="card" style="margin-top: 24px; margin-bottom: 0;">
+        <h2 style="margin-top:0; border-top:none">Updating Information</h2>
+        <p class="subtitle" style="text-align:left; margin-bottom:14px;">
+            To update:
+            <br>• Open a terminal connected to your server.
+            <br>• Go to the folder with your <code style="white-space:nowrap; color:#FF8C42;">compose.yaml</code> in it.
+            <br>• Paste this exact command, nothing added:
+        </p>
+        <div class="code-box">
+            <button class="copy-btn" onclick="copyCode(this, 'updateNoteCode')">Copy</button>
+            <pre id="updateNoteCode">docker compose pull
+docker compose up -d</pre>
+        </div>
+        <p class="subtitle" style="text-align:left; margin-bottom:0;">
+            This updates CacheNjoy, Hydra, and SABnzbd all together.
+            <br><br>Adding "cachenjoy" after pull or up, like <code style="color:#888;">docker compose pull cachenjoy</code>, only updates that one piece and leaves Hydra and SABnzbd behind. Don't add it.
+        </p>
+    </div>
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeHelp()">
+    <div class="modal-box">
+        <h3 id="modalTitle"></h3>
+        <p id="modalBody"></p>
+        <div class="example" id="modalExample" style="display:none"></div>
+        <button onclick="closeHelp()">Got it</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="browserOverlay" onclick="if(event.target===this) closeBrowser()">
+    <div class="modal-box browser-box">
+        <h3>Choose a folder</h3>
+        <div id="browserPath" class="browser-path"></div>
+        <div id="browserList" class="browser-list"></div>
+        <div class="browser-actions">
+            <button onclick="closeBrowser()">Cancel</button>
+            <button class="btn-primary" style="margin-top:0" onclick="selectCurrentFolder()">Select this folder</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+const HELP = {
+    hydraUrl: {
+        title: "Hydra URL",
+        body: "The address where your NZBHydra2 search tool runs.\n\n• Same server as CacheNjoy? Leave the default. It's an internal address only your own server can reach, not a public website.\n• Running it on a different machine or a NAS? Auto-detect won't find it there. Just type in whatever address actually reaches it from here, a domain or a LAN IP both work fine.",
+        example: "http://hydra:5076"
+    },
+    hydraKey: {
+        title: "Hydra API Key",
+        body: "Found inside NZBHydra2 itself.\n\n• Open NZBHydra2's web interface.\n• Go to Config, then Main.\n• Copy the API key shown there.",
+        example: null
+    },
+    sabUrl: {
+        title: "SABnzbd URL",
+        body: "The address where your SABnzbd downloader runs. Same idea as the Hydra URL above.\n\n• Same server as CacheNjoy? Leave the default.\n• Running it elsewhere? Type in whatever address actually reaches it from here, a domain or a LAN IP.",
+        example: "http://sabnzbd:8080"
+    },
+    sabKey: {
+        title: "SABnzbd API Key",
+        body: "Found inside SABnzbd itself.\n\n• Open SABnzbd's web interface.\n• Go to Config, then General.\n• Copy the \"API Key\" field.",
+        example: null
+    },
+    diskPath: {
+        title: "Folder where downloads are saved",
+        body: "The real path on your server's disk where SABnzbd puts finished downloads.\n\n• This is how CacheNjoy actually finds and serves your files, so it has to be correct for streaming to work at all.\n• Also used by the cleanup command below, so old files get deleted from the right place.\n• Same as the \"Completed Download Folder\" path from SABnzbd's Config, then Folders.\n• Saved here, so changing it takes effect right away. No restart needed.",
+        example: "/opt/cachenjoy/sabnzbd/downloads/complete"
+    },
+    retentionHours: {
+        title: "Delete files older than (hours)",
+        body: "How long a finished download sits around before it's eligible for deletion, counted from whenever it was last played, not just when it finished downloading.\n\n• Watching something resets this clock, the same way a download finishing starts it.\n• 5 hours is usually plenty of time to finish watching something.\n• Files currently being read are skipped automatically, no matter their age, and picked up on a later run instead."
+    },
+    incompletePath: {
+        title: "SABnzbd's incomplete/temp downloads folder",
+        body: "Failed or aborted downloads (a bad NZB, missing repair blocks, etc.) can leave leftover partial files behind in SABnzbd's temporary folder - separate from the finished-downloads folder above, and not something the cleanup command touches unless you set this.\n\n• Same as the \"Temporary Download Folder\" path from SABnzbd's Config, then Folders.\n• Anything sitting here untouched for a while is treated as abandoned and removed - a genuinely active download keeps writing new data, so it's never mistaken for one.\n• Leave blank to skip this entirely.",
+        example: "/opt/cachenjoy/sabnzbd/downloads/incomplete"
+    }
+};
+
+function showHelp(key) {
+    const h = HELP[key];
+    document.getElementById('modalTitle').innerText = h.title;
+    document.getElementById('modalBody').innerText = h.body;
+    const exEl = document.getElementById('modalExample');
+    if (h.example) {
+        exEl.style.display = 'block';
+        exEl.innerText = 'Example: ' + h.example;
+    } else {
+        exEl.style.display = 'none';
+    }
+    document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeHelp() {
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+
+let browserTargetField = null;
+let browserCurrentPath = '/';
+
+function openBrowser(targetFieldId) {
+    browserTargetField = targetFieldId;
+    const existing = document.getElementById(targetFieldId).value.trim();
+    browserCurrentPath = existing || '/';
+    document.getElementById('browserOverlay').classList.add('open');
+    loadBrowserPath(browserCurrentPath);
+}
+
+function closeBrowser() {
+    document.getElementById('browserOverlay').classList.remove('open');
+}
+
+async function loadBrowserPath(p) {
+    const listEl = document.getElementById('browserList');
+    listEl.innerHTML = '<div class="browser-item parent">Loading...</div>';
+    try {
+        const resp = await fetch('/api/browse?path=' + encodeURIComponent(p));
+        const data = await resp.json();
+        if (data.error) {
+            listEl.innerHTML = `<div class="browser-item parent">Can't open this folder: ${data.error}</div>`;
+            return;
+        }
+        browserCurrentPath = data.path;
+        document.getElementById('browserPath').textContent = data.path;
+
+        let html = '';
+        if (data.parent !== null) {
+            html += `<div class="browser-item parent" onclick="loadBrowserPath('${data.parent.replace(/'/g, "\\'")}')">&larr; .. (up one level)</div>`;
+        }
+        for (const folder of data.folders) {
+            const fullPath = (data.path === '/' ? '' : data.path) + '/' + folder;
+            html += `<div class="browser-item" onclick="loadBrowserPath('${fullPath.replace(/'/g, "\\'")}')">&#128193; ${folder}</div>`;
+        }
+        if (data.folders.length === 0 && data.parent === null) {
+            html += '<div class="browser-item parent">(empty)</div>';
+        }
+        listEl.innerHTML = html;
+    } catch (e) {
+        listEl.innerHTML = '<div class="browser-item parent">Failed to load this folder.</div>';
+    }
+}
+
+function selectCurrentFolder() {
+    if (browserTargetField) {
+        document.getElementById(browserTargetField).value = browserCurrentPath;
+    }
+    closeBrowser();
+}
+
+
+function copyCode(btn, codeId) {
+    const text = document.getElementById(codeId).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        const original = btn.innerText;
+        btn.innerText = 'Copied!';
+        setTimeout(() => btn.innerText = original, 1500);
+    });
+}
+
+async function saveSettings(btn) {
+    const settings = {
+        hydra: {
+            url: document.getElementById('hydraUrl').value,
+            apikey: document.getElementById('hydraKey').value
+        },
+        sab: {
+            url: document.getElementById('sabUrl').value,
+            apikey: document.getElementById('sabKey').value,
+            downloadsPath: document.getElementById('diskPath').value,
+            incompletePath: document.getElementById('incompletePath').value
+        },
+        cleanupEnabled: document.getElementById('cleanupEnabled').checked,
+        cleanupRetentionHours: parseFloat(document.getElementById('retentionHours').value) || 5
+    };
+
+    const resp = await fetch('/api/configure/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings)
+    });
+
+    if (resp.status === 401) { showLogin(); return; }
+
+    if (btn) {
+        const original = btn.innerText;
+        btn.innerText = 'Saved!';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.innerText = original;
+            btn.disabled = false;
+        }, 1500);
+    }
+
+    const data = await resp.json();
+    showInstallLink(data.installUrl);
+}
+
+function showInstallLink(manifestUrl) {
+    const resultEl = document.getElementById('result');
+    if (!manifestUrl) {
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = `<div>No install link yet. Something's wrong with this deployment's settings storage.</div>`;
+        return;
+    }
+    const stremioUrl = manifestUrl.replace('https://', 'stremio://').replace('http://', 'stremio://');
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `
+        <div style="margin-bottom:8px; text-align:center;"><strong>Your install link</strong> (same one every time, until you regenerate it):</div>
+        <div class="code-box" style="text-align:center;">
+            <button class="copy-btn" onclick="copyCode(this, 'installLinkCode')">Copy</button>
+            <pre id="installLinkCode" style="text-align:center;">${manifestUrl}</pre>
+        </div>
+        <a href="${stremioUrl}" class="btn-primary" style="display:block; text-decoration:none; text-align:center; box-sizing:border-box; border-radius:6px; font-size:0.95rem; font-weight:600; padding:12px 0; color:#1a1a1a !important;">Click to Install in Stremio</a>
+        <div class="result-note" style="margin-top:14px; text-align:center;">Keep this link private. It's the secret that lets Stremio reach your install.<br>Anyone with it can use your Hydra and SABnzbd as if they were you.</div>
+        <div style="text-align:center; margin-top:18px;">
+            <button class="retry-btn" style="padding:12px 24px;" onclick="doRegenerateInstallToken()">Generate a new install token</button>
+        </div>
+    `;
+}
+
+async function doRegenerateInstallToken() {
+    if (!confirm('This immediately breaks your current install link. Any Stremio app still using the old one stops working until you reinstall with the new link. Continue?')) return;
+    const resp = await fetch('/api/configure/regenerate-install-token', { method: 'POST' });
+    if (resp.status === 401) { showLogin(); return; }
+    const data = await resp.json();
+    showInstallLink(data.installUrl);
+}
+
+async function doClearCacheNow(btn) {
+    if (!confirm('This deletes every downloaded file that isn\'t currently being watched, right now - regardless of how recently it was downloaded. Continue?')) return;
+    const resultEl = document.getElementById('clearCacheResult');
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Clearing...';
+    resultEl.textContent = '';
+    try {
+        const resp = await fetch('/api/configure/cleanup-now', { method: 'POST' });
+        if (resp.status === 401) { showLogin(); return; }
+        const data = await resp.json();
+        resultEl.textContent = data.ok
+            ? 'Requested - clearing now in the background, should be done within a few seconds.'
+            : ('Failed: ' + (data.error || 'unknown error'));
+    } catch (e) {
+        resultEl.textContent = 'Failed: ' + e.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
+async function changePassword(btn) {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('newPasswordConfirm').value;
+    const resultEl = document.getElementById('changePasswordResult');
+    resultEl.style.display = 'block';
+
+    if (newPassword.length < 8) {
+        resultEl.innerHTML = '<div style="color:#e05050;">New password must be at least 8 characters.</div>';
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        resultEl.innerHTML = '<div style="color:#e05050;">New passwords don\'t match.</div>';
+        return;
+    }
+
+    const resp = await fetch('/api/configure/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword })
+    });
+    if (resp.status === 401) {
+        const data = await resp.json().catch(() => ({}));
+        resultEl.innerHTML = `<div style="color:#e05050;">${data.error || 'Current password is wrong.'}</div>`;
+        return;
+    }
+    if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        resultEl.innerHTML = `<div style="color:#e05050;">${data.error || 'Could not change password.'}</div>`;
+        return;
+    }
+
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('newPasswordConfirm').value = '';
+    resultEl.innerHTML = '<div style="color:#4caf50;">Password changed.</div>';
+}
+
+async function autoDetect(which) {
+    const targets = which ? [which] : ['hydra', 'sab'];
+
+    for (const t of targets) {
+        const statusEl = document.getElementById(t === 'hydra' ? 'hydraUrlStatus' : 'sabUrlStatus');
+        statusEl.textContent = 'checking...';
+        statusEl.className = 'detect-status checking';
+    }
+
+    try {
+        const resp = await fetch('/api/autodetect?for=' + targets.join(','));
+        const data = await resp.json();
+
+        if (targets.includes('hydra')) {
+            const statusEl = document.getElementById('hydraUrlStatus');
+            if (data.hydraUrl) {
+                document.getElementById('hydraUrl').value = data.hydraUrl;
+                statusEl.textContent = '✓ URL found, enter the key manually';
+                statusEl.className = 'detect-status found';
+            } else {
+                statusEl.textContent = 'not found, enter manually';
+                statusEl.className = 'detect-status notfound';
+            }
+        }
+
+        if (targets.includes('sab')) {
+            const statusEl = document.getElementById('sabUrlStatus');
+            if (data.sabUrl) {
+                document.getElementById('sabUrl').value = data.sabUrl;
+                if (data.sabApiKey) {
+                    document.getElementById('sabKey').value = data.sabApiKey;
+                    statusEl.textContent = '✓ URL and key found automatically';
+                } else {
+                    statusEl.textContent = '✓ URL found, enter the key manually';
+                }
+                statusEl.className = 'detect-status found';
+            } else {
+                statusEl.textContent = 'not found, enter manually';
+                statusEl.className = 'detect-status notfound';
+            }
+        }
+    } catch (e) {
+        for (const t of targets) {
+            const statusEl = document.getElementById(t === 'hydra' ? 'hydraUrlStatus' : 'sabUrlStatus');
+            statusEl.textContent = 'auto-detect failed, enter manually';
+            statusEl.className = 'detect-status notfound';
+        }
+    }
+}
+
+function showLogin() {
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('setupScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'none';
+}
+
+function showSetup() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('setupScreen').style.display = 'block';
+    document.getElementById('adminPanel').style.display = 'none';
+}
+
+function showPanel() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('setupScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+}
+
+function toggleForgotPassword() {
+    const el = document.getElementById('forgotPasswordNote');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+async function setupPassword() {
+    const password = document.getElementById('setupPassword').value;
+    const confirm = document.getElementById('setupPasswordConfirm').value;
+    const errEl = document.getElementById('setupError');
+    errEl.style.display = 'none';
+
+    if (password.length < 8) {
+        errEl.textContent = 'Password must be at least 8 characters.';
+        errEl.style.display = 'block';
+        return;
+    }
+    if (password !== confirm) {
+        errEl.textContent = "Passwords don't match.";
+        errEl.style.display = 'block';
+        return;
+    }
+
+    const resp = await fetch('/api/configure/set-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+    });
+    if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        errEl.textContent = data.error || 'Could not set password.';
+        errEl.style.display = 'block';
+        return;
+    }
+    await loadSettingsAndShowPanel();
+}
+
+async function login() {
+    const password = document.getElementById('loginPassword').value;
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    const resp = await fetch('/api/configure/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+    });
+    if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        errEl.textContent = data.error || 'Login failed.';
+        errEl.style.display = 'block';
+        return;
+    }
+    await loadSettingsAndShowPanel();
+}
+
+async function logout() {
+    await fetch('/api/configure/logout', { method: 'POST' });
+    showLogin();
+}
+
+async function loadSettingsAndShowPanel() {
+    const statusResp = await fetch('/api/configure/auth-status');
+    const status = await statusResp.json();
+    if (!status.hasPassword) { showSetup(); return; }
+
+    const resp = await fetch('/api/configure/settings');
+    if (resp.status === 401) { showLogin(); return; }
+    const settings = await resp.json();
+
+    document.getElementById('hydraUrl').value = settings.hydra.url || '';
+    document.getElementById('hydraKey').value = settings.hydra.apikey || '';
+    document.getElementById('sabUrl').value = settings.sab.url || '';
+    document.getElementById('sabKey').value = settings.sab.apikey || '';
+    document.getElementById('diskPath').value = settings.sab.downloadsPath || '';
+    document.getElementById('incompletePath').value = settings.sab.incompletePath || '';
+    document.getElementById('cleanupEnabled').checked = !!settings.cleanupEnabled;
+    document.getElementById('retentionHours').value = settings.cleanupRetentionHours || 5;
+    showInstallLink(settings.installUrl);
+    showPanel();
+
+    if (!settings.hydra.url) autoDetect('hydra');
+    if (!settings.sab.url) autoDetect('sab');
+}
+
+loadSettingsAndShowPanel();
+</script>
+</body>
+</html>
