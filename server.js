@@ -137,8 +137,37 @@ app.get("/api/configure/settings", requireAdmin, (req, res) => {
   res.json(publicSettingsView(req, loadSettings()));
 });
 
-app.post("/api/configure/settings", requireAdmin, express.json(), (req, res) => {
+// SABnzbd needs to know it's being reverse-proxied under /sabnzbd so its
+// own links/redirects/assets come out correctly prefixed - the proxy
+// itself only strips/adds this prefix for Hydra, not SABnzbd, since
+// SABnzbd's UI (unlike Hydra's) embeds this path pervasively rather than
+// in one config value, so matching it on SABnzbd's own side is far less
+// fragile than trying to rewrite every link. Setting it via the API
+// (rather than editing sabnzbd.ini directly, which this container
+// couldn't do anyway - it's read-only on the host) takes effect
+// immediately, no SABnzbd restart needed.
+async function ensureSabUrlBase(sab) {
+  if (!sab.url || !sab.apikey) return;
+  try {
+    const p = new URLSearchParams({
+      mode: "set_config",
+      section: "misc",
+      keyword: "url_base",
+      value: "/sabnzbd",
+      apikey: sab.apikey,
+      output: "json",
+    });
+    await fetch(`${sab.url}/api?${p.toString()}`, { signal: AbortSignal.timeout(5000) });
+  } catch (e) {
+    // best effort - if SABnzbd isn't reachable yet the proxy tab just
+    // won't work until the next successful settings save
+    console.error("[configure] couldn't set SABnzbd's url_base:", e.message);
+  }
+}
+
+app.post("/api/configure/settings", requireAdmin, express.json(), async (req, res) => {
   const saved = saveSettings(req.body || {});
+  if (req.body && req.body.sab) await ensureSabUrlBase(saved.sab);
   res.json(publicSettingsView(req, saved));
 });
 
