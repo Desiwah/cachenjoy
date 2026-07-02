@@ -27,7 +27,7 @@ You'll need Docker, a domain pointed at your server, and a reverse proxy
 (Caddy, nginx, whatever you already run) in front of it for HTTPS.
 
 ```
-git clone https://github.com/YOURNAME/cachenjoy
+git clone https://github.com/Desiwah/cachenjoy
 cd cachenjoy
 cp .env.example .env      # fill in your domain and a files token
 docker compose up -d --build
