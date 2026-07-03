@@ -655,10 +655,37 @@ const inFlight = new Map();
 const RESULT_TTL_MS = 30 * 60 * 1000;
 const resultCache = new Map();
 
+// cleanup (scheduled or the clear-now button) deletes files without
+// telling this process, so a cache hit has to re-check the disk - without
+// this the lightning icon lies for up to RESULT_TTL_MS after a cleanup
+// and playback redirects to a file that's gone
+function cachedFileGone(url) {
+  try {
+    const marker = `/files/${FILES_SECRET_TOKEN}/`;
+    const idx = url.indexOf(marker);
+    if (idx === -1) return false; // not served by us, nothing to verify
+    const rel = url
+      .slice(idx + marker.length)
+      .split("/")
+      .filter(Boolean)
+      .map(decodeURIComponent)
+      .join(path.sep);
+    const { sab } = loadSettings();
+    if (!sab.downloadsPath) return false;
+    return !fs.existsSync(path.join(HOST_ROOT, sab.downloadsPath, rel));
+  } catch (e) {
+    return false; // can't verify, assume it's still there
+  }
+}
+
 function getCachedResult(key) {
   const entry = resultCache.get(key);
   if (!entry) return null;
   if (Date.now() > entry.expiresAt) {
+    resultCache.delete(key);
+    return null;
+  }
+  if (cachedFileGone(entry.url)) {
     resultCache.delete(key);
     return null;
   }
