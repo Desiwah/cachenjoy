@@ -62,6 +62,18 @@ You need your own Usenet provider and indexers.
 
 &nbsp;
 
+# **Screenshots**
+
+<a href="assets/screenshots/stremio.png">
+  <img src="assets/screenshots/stremio.png" alt="Stremio search results with cached and downloadable streams" width="400">
+</a>
+
+<a href="assets/screenshots/configure.png">
+  <img src="assets/screenshots/configure.png" alt="Configure page screenshot" width="400">
+</a>
+
+&nbsp;
+
 # **Auto-cleanup**
 
 Downloads pile up, so a separate container watches the downloads folder and deletes anything that hasn't been used for N hours (using something resets its clock, and files currently being streamed are never touched). It can also clear out leftovers from failed downloads if you point it at SABnzbd's incomplete folder. All of it is optional and configured from the same page, including a "clear cache now" button.
