@@ -784,7 +784,9 @@ addonRouter.get("/play/:payload", async (req, res) => {
           headers: { "Content-Type": "video/mp4" },
         });
       }
-      return res.redirect(302, `${req.path}?a=${attempt + 1}`);
+      // req.path loses the /:installToken mount prefix inside the router,
+      // so the self-redirect needs baseUrl or the token 404s the poll chain
+      return res.redirect(302, `${req.baseUrl}${req.path}?a=${attempt + 1}`);
     }
 
     recordPlay(result.url);
