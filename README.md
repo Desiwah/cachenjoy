@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/Desiwah/cachenjoy/blob/master/assets/logo/logo.svg?raw=true" alt="CacheNjoy Icon" width="80" height="80">
+</p>
+
 <h1 align="center">CacheNjoy</h1>
 
 <p align="center"><b>CacheNjoy</b> is a self-hosted Stremio addon for Usenet. It searches your NZBHydra2 indexers, downloads the result you pick with SABnzbd, and streams the finished file straight from your own server. Once something is downloaded, replaying it is instant.</p>
