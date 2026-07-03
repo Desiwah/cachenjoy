@@ -189,7 +189,9 @@
         margin: 0;
         padding-right: 70px;
         white-space: pre-wrap;
-        word-break: break-all;
+        /* wraps at spaces normally, only breaks inside a word when a single
+           long token (like an install URL) wouldn't fit otherwise */
+        overflow-wrap: anywhere;
         font-family: 'Courier New', monospace;
         font-size: 0.8rem;
         color: #FF8C42;
@@ -632,12 +634,11 @@ docker compose pull
 docker compose up -d --build</pre>
         </div>
         <p class="subtitle" style="text-align:left; margin-bottom:0;">
-            This updates CacheNjoy, Hydra, and SABnzbd all together - CacheNjoy is
-            built from this folder's source, so <code style="color:#888;">git pull</code>
-            and <code style="color:#888;">--build</code> are what actually update it.
-            <br><br>Best done while nothing is downloading or being watched: the restart
-            makes a player that's mid-loading sit on its spinner. The download itself
-            survives - re-open the stream and it picks right back up.
+            This updates all three together - CacheNjoy is built from this
+            folder's source, so <code style="color:#888;">git pull</code> and
+            <code style="color:#888;">--build</code> are what actually update it.
+            <br><br>Update while nothing is downloading or being watched - if a
+            stream was mid-load, just re-open it after.
         </p>
     </div>
     </div>
