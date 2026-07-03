@@ -1,6 +1,6 @@
 {
   "name": "cachenjoy",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "Self-hosted Stremio addon that searches Usenet via NZBHydra2, downloads with SABnzbd, then streams the finished file",
   "main": "server.js",
   "dependencies": {

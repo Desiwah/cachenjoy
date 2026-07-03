@@ -555,7 +555,7 @@ addonRouter.get("/manifest.json", (req, res) => {
   const configured = !!(settings.hydra.url && settings.sab.url);
   res.json({
     id: "community.cachenjoy",
-    version: "2.0.0",
+    version: "1.0.0",
     name: "CacheNjoy",
     description: configured
       ? "Searches NZBHydra2, caches via SABnzbd, then plays it."
