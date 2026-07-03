@@ -77,6 +77,41 @@ function recordFailedJob(name) {
   }
 }
 
+// NZBs SABnzbd verdict-failed (missing articles, takedowns) - those never
+// come back, so the stream list hides them instead of offering the same
+// dead pick again. TTL'd anyway in case a provider hiccup got one wrong.
+const DEAD_NZBS_FILE = "/app/data/dead-nzbs.json";
+const DEAD_NZB_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+function recordDeadNzb(nzbUrl) {
+  try {
+    let entries = {};
+    try {
+      entries = JSON.parse(fs.readFileSync(DEAD_NZBS_FILE, "utf8"));
+    } catch (e) {}
+    entries[nzbUrl] = Date.now();
+    for (const [url, t] of Object.entries(entries)) {
+      if (Date.now() - t >= DEAD_NZB_TTL_MS) delete entries[url];
+    }
+    fs.writeFileSync(DEAD_NZBS_FILE, JSON.stringify(entries));
+  } catch (e) {
+    // failed write just means this one shows up in results again
+  }
+}
+
+function getDeadNzbUrls() {
+  try {
+    const entries = JSON.parse(fs.readFileSync(DEAD_NZBS_FILE, "utf8"));
+    return new Set(
+      Object.entries(entries)
+        .filter(([, t]) => Date.now() - t < DEAD_NZB_TTL_MS)
+        .map(([url]) => url)
+    );
+  } catch (e) {
+    return new Set();
+  }
+}
+
 function urlFromStorage(cfg, storage) {
   const rel = resolveVideoRelativePath(cfg.downloadsPath, storage);
   const base = process.env.ADDON_BASE_URL;
@@ -127,6 +162,7 @@ async function submitAndWait(cfg, { nzbUrl, title }, { onProgress, signal } = {}
       }
       if (slot.status === "Failed") {
         recordFailedJob(slot.name || title);
+        recordDeadNzb(nzbUrl);
         throw new Error(`sabnzbd download failed: ${slot.fail_message || "unknown reason"}`);
       }
     } else {
@@ -153,4 +189,4 @@ async function getCompletedTitles(cfg) {
   );
 }
 
-module.exports = { submitAndWait, getCompletedTitles };
+module.exports = { submitAndWait, getCompletedTitles, getDeadNzbUrls };

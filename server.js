@@ -593,7 +593,13 @@ addonRouter.get("/stream/:type/:id.json", async (req, res) => {
     }
     imdbid = imdbid.replace(/^tt/, "");
 
-    const results = await searchHydra(cfg.hydra, { imdbid, season, ep });
+    // hide releases SABnzbd already gave a Failed verdict on (missing
+    // articles, takedowns) - those can never complete, listing them again
+    // just wastes the next click
+    const deadNzbs = BACKEND_MODULES.sabnzbd.getDeadNzbUrls();
+    const results = (await searchHydra(cfg.hydra, { imdbid, season, ep })).filter(
+      (r) => !deadNzbs.has(r.link)
+    );
 
     // check SABnzbd's real history, not just the in-memory cache which
     // resets on every restart, so the "already downloaded" icon stays right
@@ -657,6 +663,22 @@ function getCachedResult(key) {
     return null;
   }
   return entry.url;
+}
+
+// failures have to be remembered too - a rejection that lands between two
+// poll hops leaves no cache and no in-flight promise, so the next hop
+// would resubmit the same dead NZB to SABnzbd in an endless loop
+const FAIL_TTL_MS = 10 * 60 * 1000;
+const failCache = new Map();
+
+function getFailedResult(key) {
+  const entry = failCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    failCache.delete(key);
+    return null;
+  }
+  return entry.message;
 }
 
 async function resolvePlay(cfg, payload) {
@@ -748,6 +770,14 @@ addonRouter.get("/play/:payload", async (req, res) => {
     return res.redirect(302, cachedUrl);
   }
 
+  const recentFailure = getFailedResult(dedupeKey);
+  if (recentFailure) {
+    console.error(`[play] serving fail clip, recently failed for title="${payload.t}": ${recentFailure}`);
+    return res.sendFile(path.join(__dirname, "assets", "fail.mp4"), {
+      headers: { "Content-Type": "video/mp4" },
+    });
+  }
+
   let promise = inFlight.get(dedupeKey);
   if (promise) {
     console.log(`[play] reusing in-flight request for title="${payload.t}"`);
@@ -758,7 +788,9 @@ addonRouter.get("/play/:payload", async (req, res) => {
       .then((url) => {
         resultCache.set(dedupeKey, { url, expiresAt: Date.now() + RESULT_TTL_MS });
       })
-      .catch(() => {})
+      .catch((e) => {
+        failCache.set(dedupeKey, { message: e.message, expiresAt: Date.now() + FAIL_TTL_MS });
+      })
       .finally(() => inFlight.delete(dedupeKey));
   }
 
