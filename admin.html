@@ -458,44 +458,6 @@
 
 <div id="tab-configuration" class="tab-page active">
     <div class="page-layout">
-    <div class="sidebar">
-    <div class="card" style="margin-bottom: 0;">
-        <h2 style="margin-top:0; border-top:none">Auto-Cleanup (optional)</h2>
-        <p class="subtitle" style="text-align:left; margin-bottom:1.5rem">
-            Downloaded files pile up over time. This runs entirely on its own, no command to paste anywhere.
-            <br>• A separate, isolated piece of CacheNjoy checks every 5 minutes.
-            <br>• Skips anything currently being watched.
-            <br>• Also skips anything played recently, even if it's not open right now - the clock resets on every play, not just on download.
-            <br>• If you set SABnzbd's incomplete folder in the SABnzbd step, leftovers from failed or aborted downloads get cleared too.
-        </p>
-
-        <div class="toggle-row">
-            <div>
-                <div class="toggle-label">Enable automatic cleanup</div>
-                <div class="toggle-desc">Deletes old, unwatched downloads on its own.</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="cleanupEnabled">
-                <span class="switch-slider"></span>
-            </label>
-        </div>
-
-        <div class="field">
-            <div class="field-label-row">
-                <label>Delete files older than (hours)</label>
-                <button class="help-btn" onclick="showHelp('retentionHours')">?</button>
-            </div>
-            <input id="retentionHours" type="number" value="5" min="1">
-        </div>
-
-        <div class="field" style="margin-bottom:0;">
-            <button class="retry-btn" style="width:100%; padding:12px 0;" onclick="doClearCacheNow(this)">Clear cache now</button>
-            <div class="result-note" style="margin-top:8px;">Removes everything not currently being watched, right now, regardless of the hours above or whether auto-cleanup is even on. Also clears out abandoned leftovers from the incomplete folder, if set. Doesn't change either setting.</div>
-            <div id="clearCacheResult" class="result-note" style="margin-top:8px;"></div>
-        </div>
-    </div>
-    </div>
-
     <div class="main-column">
     <div class="card intro-card">
         <h1><b>Cache</b>Njoy</h1>
@@ -589,6 +551,44 @@
         <p class="subtitle" style="margin-bottom:1rem">Save your settings. Your install link stays the same forever, even after future changes here.</p>
         <button class="btn-primary" onclick="saveSettings(this)">Save</button>
         <div id="result"></div>
+    </div>
+    </div>
+
+    <div class="sidebar">
+    <div class="card" style="margin-bottom: 0;">
+        <h2 style="margin-top:0; border-top:none">Auto-Cleanup (optional)</h2>
+        <p class="subtitle" style="text-align:left; margin-bottom:1.5rem">
+            Downloaded files pile up over time. This runs entirely on its own, no command to paste anywhere.
+            <br>• A separate, isolated piece of CacheNjoy checks every 5 minutes.
+            <br>• Skips anything currently being watched.
+            <br>• Also skips anything played recently, even if it's not open right now - the clock resets on every play, not just on download.
+            <br>• If you set SABnzbd's incomplete folder in the SABnzbd step, leftovers from failed or aborted downloads get cleared too.
+        </p>
+
+        <div class="toggle-row">
+            <div>
+                <div class="toggle-label">Enable automatic cleanup</div>
+                <div class="toggle-desc">Deletes old, unwatched downloads on its own.</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="cleanupEnabled">
+                <span class="switch-slider"></span>
+            </label>
+        </div>
+
+        <div class="field">
+            <div class="field-label-row">
+                <label>Delete files older than (hours)</label>
+                <button class="help-btn" onclick="showHelp('retentionHours')">?</button>
+            </div>
+            <input id="retentionHours" type="number" value="5" min="1">
+        </div>
+
+        <div class="field" style="margin-bottom:0;">
+            <button class="retry-btn" style="width:100%; padding:12px 0;" onclick="doClearCacheNow(this)">Clear cache now</button>
+            <div class="result-note" style="margin-top:8px;">Removes everything not currently being watched, right now, regardless of the hours above or whether auto-cleanup is even on. Also clears out abandoned leftovers from the incomplete folder, if set. Doesn't change either setting.</div>
+            <div id="clearCacheResult" class="result-note" style="margin-top:8px;"></div>
+        </div>
     </div>
     </div>
 
