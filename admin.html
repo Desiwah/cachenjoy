@@ -627,12 +627,17 @@
         </p>
         <div class="code-box">
             <button class="copy-btn" onclick="copyCode(this, 'updateNoteCode')">Copy</button>
-            <pre id="updateNoteCode">docker compose pull
-docker compose up -d</pre>
+            <pre id="updateNoteCode">git pull
+docker compose pull
+docker compose up -d --build</pre>
         </div>
         <p class="subtitle" style="text-align:left; margin-bottom:0;">
-            This updates CacheNjoy, Hydra, and SABnzbd all together.
-            <br><br>Adding "cachenjoy" after pull or up, like <code style="color:#888;">docker compose pull cachenjoy</code>, only updates that one piece and leaves Hydra and SABnzbd behind. Don't add it.
+            This updates CacheNjoy, Hydra, and SABnzbd all together - CacheNjoy is
+            built from this folder's source, so <code style="color:#888;">git pull</code>
+            and <code style="color:#888;">--build</code> are what actually update it.
+            <br><br>Best done while nothing is downloading or being watched: the restart
+            makes a player that's mid-loading sit on its spinner. The download itself
+            survives - re-open the stream and it picks right back up.
         </p>
     </div>
     </div>
